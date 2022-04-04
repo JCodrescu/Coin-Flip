@@ -1,0 +1,39 @@
+.PlayOptions {
+    text-align: center;
+    font-size: 35px;
+    margin-top: 200px;
+}
+
+.PlayOption {
+    margin: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    text-decoration: none;
+    margin-right: 500px;
+    margin-left: 500px;
+    transition: all .1s ease-in-out;
+}
+
+.PlayOption:hover, .PlayOption:focus {
+    font-size: 45px;
+    color: purple;
+}
+
+#FlipOption:hover, #FlipOption:focus {
+    font-size: 50px;
+    color: purple;
+}
+
+a:link, a:visited {
+    color: black;
+}
+
+#FlipOption {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    text-decoration: none;
+    margin-left: 660px;
+    margin-right: 660px;
+}

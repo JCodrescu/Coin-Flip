@@ -1,0 +1,42 @@
+.StartHeader {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.CoinLogo {
+    animation-duration: 4s;
+    animation-name: spin;
+    animation-iteration-count: infinite;
+}
+  
+  @keyframes spin {
+    from {
+        transform: rotateY(0deg);
+    }
+  
+    to {
+        transform: rotateY(360deg);
+    }
+  }
+
+#flip {
+    font-size: 70px;
+    margin-left: 30px;
+    margin-bottom: 5px;
+}
+
+.Hamburger {
+    margin-right: 10px;
+}
+
+.Hamburger:hover, .Hamburger:focus {
+    color: grey;
+}
+
+.StartLogo {
+    display: flex;
+    align-items: center;
+    margin-left: 30px;
+}
