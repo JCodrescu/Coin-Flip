@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 500 500" style="enable-background:new 0 0 397.7 311.7;" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+	.st0{fill:url(#SVGID_1_);}
+	.st1{fill:url(#SVGID_2_);}
+	.st2{fill:url(#SVGID_3_);}
+</style>
+  <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="360.8791" y1="351.4553" x2="141.213" y2="-69.2936" gradientTransform="matrix(0.44399, 0, 0, -0.445149, 167.581604, 315.933411)">
+    <stop offset="0" style="stop-color:#00FFA3"/>
+    <stop offset="1" style="stop-color:#DC1FFF"/>
+  </linearGradient>
+  <linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="264.8291" y1="401.6014" x2="45.163" y2="-19.1475" gradientTransform="matrix(0.44399, 0, 0, -0.445149, 167.581604, 315.933411)">
+    <stop offset="0" style="stop-color:#00FFA3"/>
+    <stop offset="1" style="stop-color:#DC1FFF"/>
+  </linearGradient>
+  <linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="312.5484" y1="376.688" x2="92.8822" y2="-44.061" gradientTransform="matrix(0.44399, 0, 0, -0.445149, 167.581604, 315.933411)">
+    <stop offset="0" style="stop-color:#00FFA3"/>
+    <stop offset="1" style="stop-color:#DC1FFF"/>
+  </linearGradient>
+
+<g transform="matrix(0.997555, 0, 0, 1, 273.208771, 2.754225)">
+    <title>coin-back</title>
+    <ellipse ry="204" rx="204.5" id="svg_5" cy="248.211" cx="-25.513" style="stroke: rgb(0, 0, 0); fill:purple; stroke-width: 3.00367px;"/>
+  </g>
+  <ellipse style="fill: rgb(82, 197, 168);" cx="247.758" cy="250.965" rx="176.881" ry="181.808">
+    <title>coin-back</title>
+  </ellipse>
+  <!-- <ellipse style="fill: rgb(128, 0, 128); stroke: rgb(0, 0, 0); stroke-width: 3px;" cx="247.8" cy="245.534" rx="204" ry="204" tabindex="0">
+    <title>coin-back</title>
+  </ellipse>
+  <ellipse style="fill: rgb(82, 197, 168); stroke: rgba(0, 0, 0, 0);" cx="247.8" cy="245.534" rx="176.881" ry="181.808" tabindex="0">
+    <title>coin-back</title>
+  </ellipse> -->
+  <g transform="matrix(1.13255, 0, 0, 1.081058, -41.984573, -19.901964)">
+    <path class="st0" d="M 196.264 282.058 C 197.329 280.99 198.794 280.366 200.348 280.366 L 341.271 280.366 C 343.846 280.366 345.133 283.483 343.313 285.308 L 315.475 313.218 C 314.409 314.287 312.944 314.91 311.39 314.91 L 170.468 314.91 C 167.893 314.91 166.605 311.794 168.425 309.969 L 196.264 282.058 Z" style="stroke: rgb(0, 0, 0); stroke-width: 2px;"/>
+    <path class="st1" d="M 196.264 177.849 C 197.374 176.78 198.839 176.157 200.348 176.157 L 341.271 176.157 C 343.846 176.157 345.133 179.273 343.313 181.098 L 315.475 209.009 C 314.409 210.078 312.944 210.701 311.39 210.701 L 170.468 210.701 C 167.893 210.701 166.605 207.585 168.425 205.76 L 196.264 177.849 Z" style="stroke: rgb(0, 0, 0); stroke-width: 2px;"/>
+    <path class="st2" d="M 315.475 229.62 C 314.409 228.551 312.944 227.928 311.39 227.928 L 170.468 227.928 C 167.893 227.928 166.605 231.044 168.425 232.869 L 196.264 260.78 C 197.329 261.848 198.794 262.471 200.348 262.471 L 341.271 262.471 C 343.846 262.471 345.133 259.355 343.313 257.53 L 315.475 229.62 Z" style="stroke: rgb(0, 0, 0); stroke-width: 2px;"/>
+  </g>
+</svg>

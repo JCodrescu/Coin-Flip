@@ -4,19 +4,19 @@ function PlayOptions() {
     return (
         <div className="PlayOptions">
             <a 
-                href=""
+                href="/flip"
                 className='PlayOption'
             >
                 flip
             </a>
             <a 
-                href=""
+                href="/flip"
                 className='PlayOption'
             >
                 create private room
             </a>
             <a 
-                href=""
+                href="/flip"
                 className='PlayOption'
             >
                 join private room

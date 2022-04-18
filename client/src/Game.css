@@ -1,0 +1,55 @@
+#GameMain {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    vertical-align: center;
+    min-width: 900px;
+}
+
+#Game {
+    display: flex;
+    flex-direction: column;
+}
+
+#GamePrize {
+    display: flex;
+    justify-content: center;
+}
+
+.GameOverOption {
+    text-decoration: none;
+    margin: 10px;
+}
+
+.GameOverOptions {
+    margin: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 25px;
+}
+
+.GameOverOption:hover, .GameOverOption:focus {
+    font-size: 35px;
+    color: purple;
+}
+
+.GamePrize {
+    margin: 50px;
+    display: flex; 
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+}
+
+.GamePrizeText {
+    margin: 5px;
+}
+
+.GamePrizeAmount {
+    margin: 5px;
+    color: green;
+}

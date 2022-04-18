@@ -10,8 +10,8 @@
     flex-direction: row;
     justify-content: center;
     text-decoration: none;
-    margin-right: 500px;
-    margin-left: 500px;
+    margin-right: 450px;
+    margin-left: 450px;
     transition: all .1s ease-in-out;
 }
 
@@ -20,20 +20,6 @@
     color: purple;
 }
 
-#FlipOption:hover, #FlipOption:focus {
-    font-size: 50px;
-    color: purple;
-}
-
 a:link, a:visited {
     color: black;
-}
-
-#FlipOption {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    text-decoration: none;
-    margin-left: 660px;
-    margin-right: 660px;
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import OverlayMenu from "./OverlayMenu";
 import PlayOptions from "./PlayOptions";
-import StartHeader from "./StartHeader";
+import Header from "./Header";
 import './App.css';
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
 
     return (
     <div className="app">
-        <StartHeader onMenuClick={() => activeMenu(!isMenuActive)}/>
+        <Header onMenuClick={() => activeMenu(!isMenuActive)}/>
         <PlayOptions />
         <OverlayMenu 
             isMenuActive={isMenuActive}

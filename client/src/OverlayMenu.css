@@ -54,7 +54,7 @@
 
 .side-menu__overlay {
     position: absolute;
-    display: block;
+    display: flex;
     height: 100%;
     width: 100%;
 }
@@ -74,18 +74,16 @@
     margin-top: 200px;
 }
 
-/* .side-menu-hamburger {
-    display: flex;
-    justify-content: flex-end;
-    flex-direction: row;
-    margin-right: 28px;
-    margin-top: 38px;
-} */
-
-#MenuHamburger {
+#quitButton {
     position: absolute;
     right: 0;
     margin-top: 35px;
+    margin: 45px 40px;
+    cursor: pointer;
+}
+
+#quitButton:hover, #quitButton:focus {
+    opacity: .6;
 }
 
 .MenuOption {

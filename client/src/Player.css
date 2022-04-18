@@ -1,0 +1,48 @@
+.Player {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    height: 150px;
+    overflow: hidden;
+    margin: 10px;
+}
+
+.PlayerRow {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    margin: 10px;
+    width: 340px;
+}
+
+.PlayerRowText {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 20px;
+    width: 75px;
+    font-size: 20px;
+    color: purple;
+    align-items: center;
+    align-content: center;
+}
+
+.PlayerRowInput {
+    display: flex;
+    justify-content: flex-start;
+    font-size: 20px;
+    width: 200px;
+    align-items: center;
+    align-content: center;
+}
+
+.PlayerRowInput-winner {
+    color: green;
+    display: flex;
+    justify-content: flex-start;
+    font-size: 20px;
+    width: 200px;
+    align-items: center;
+    align-content: center;
+}
