@@ -7,7 +7,8 @@ import './App.css';
 function App() {
     const [isMenuActive, activeMenu] = useState(false);
 
-    console.log(process.env.API_URL);
+    console.log("url: ");
+    console.log(process.env.REACT_APP_API_URL);
 
     return (
     <div className="app">
