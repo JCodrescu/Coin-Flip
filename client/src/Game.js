@@ -16,7 +16,7 @@ function Game() {
     const [winningSide, setWinningSide] = useState('Heads');
 
     useEffect(() => {
-        fetch(process.env.REACT_APP_API_URL + '/gameWinner')
+        fetch('/gameWinner')
             .then(res => res.json())
             .then((result) => {
                 setWinningSide(result['winner']);
@@ -25,12 +25,11 @@ function Game() {
 
     function reset() {
         setFlipState('loading');
-        fetch(process.env.REACT_APP_API_URL + '/gameWinner')
+        fetch('/gameWinner')
             .then(res => res.json())
             .then((result) => {
                 setWinningSide(result['winner']);
             });
-        // setWinningSide(Math.floor(Math.random() * 2) === 0 ? 'Heads' : 'Tails');
         setResult(null);
     }
 

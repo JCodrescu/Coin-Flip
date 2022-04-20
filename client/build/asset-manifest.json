@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "./static/css/main.397a8df9.css",
+    "main.js": "./static/js/main.b1e383b4.js",
+    "static/js/787.9130d154.chunk.js": "./static/js/787.9130d154.chunk.js",
+    "static/media/coin-front.svg": "./static/media/coin-front.f0fcaf61b5c0f7a4e32d6348f5f785a8.svg",
+    "static/media/solana-sol-logo.svg": "./static/media/solana-sol-logo.b612f1402147c92338bed5af1879b175.svg",
+    "static/media/coin-back-loading.svg": "./static/media/coin-back-loading.f58fa8826883dabecebb9b494c357a7d.svg",
+    "static/media/coin-back-ready.svg": "./static/media/coin-back-ready.137166922786c47ec0711e834c04e94e.svg",
+    "static/media/quitButton.svg": "./static/media/quitButton.1ce4eb4af360d7c902e5c0fcab3fba5b.svg",
+    "static/media/hamburger.svg": "./static/media/hamburger.623f55e33d6e902440ae2fd63454b6ff.svg",
+    "index.html": "./index.html",
+    "main.397a8df9.css.map": "./static/css/main.397a8df9.css.map",
+    "main.b1e383b4.js.map": "./static/js/main.b1e383b4.js.map",
+    "787.9130d154.chunk.js.map": "./static/js/787.9130d154.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.397a8df9.css",
+    "static/js/main.b1e383b4.js"
+  ]
+}

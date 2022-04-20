@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon start app.js" 
+    "start": "cd client && npm i && npm run build && cd ../ && npm i && nodemon start app.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +13,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.3",
-    "nodemon": "^2.0.15"
-  }
+    "nodemon": "^2.0.15",
+    "path": "^0.12.7"
+  },
+  "homepage": "."
 }
