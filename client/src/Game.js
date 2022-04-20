@@ -1,6 +1,6 @@
 import CoinFlip from "./CoinFlip";
 import { useLocation } from 'react-router-dom';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import backReady from './coin-back-ready.svg';
 import backLoading from './coin-back-loading.svg';
 import Player from './Player';
@@ -13,13 +13,24 @@ function Game() {
     const [player2Side, changePlayer2Side] = useState(player1Side === 'Heads' ? 'Tails' : 'Heads');
     const [flipState, setFlipState] = useState('loading');
     const [result, setResult] = useState(null);
-    const [winningSide, setWinningSide] = useState(Math.floor(Math.random() * 2) === 0 ? 'Heads' : 'Tails');
+    const [winningSide, setWinningSide] = useState('Heads');
 
-    console.log(window.innerWidth);
+    useEffect(() => {
+        fetch(process.env.REACT_APP_API_URL + '/gameWinner')
+            .then(res => res.json())
+            .then((result) => {
+                setWinningSide(result['winner']);
+            });
+    }, []);
 
     function reset() {
         setFlipState('loading');
-        setWinningSide(Math.floor(Math.random() * 2) === 0 ? 'Heads' : 'Tails');
+        fetch(process.env.REACT_APP_API_URL + '/gameWinner')
+            .then(res => res.json())
+            .then((result) => {
+                setWinningSide(result['winner']);
+            });
+        // setWinningSide(Math.floor(Math.random() * 2) === 0 ? 'Heads' : 'Tails');
         setResult(null);
     }
 

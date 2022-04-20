@@ -7,9 +7,6 @@ import './App.css';
 function App() {
     const [isMenuActive, activeMenu] = useState(false);
 
-    console.log("url: ");
-    console.log(process.env.REACT_APP_API_URL);
-
     return (
     <div className="app">
         <Header onMenuClick={() => activeMenu(!isMenuActive)}/>
