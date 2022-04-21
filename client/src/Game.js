@@ -9,8 +9,8 @@ import Confetti from 'react-confetti';
 
 function Game() {
     const location = useLocation()
-    const { player1Name, player1Bet, player1Side } = location.state;
-    const [player2Side, changePlayer2Side] = useState(player1Side === 'Heads' ? 'Tails' : 'Heads');
+    const { player1Name, player1Bet, player1Side, player1Wallet } = location.state;
+    const [player2, changePlayer2] = useState({name: null, side: null, wallet: null});
     const [flipState, setFlipState] = useState('loading');
     const [result, setResult] = useState(null);
     const [winningSide, setWinningSide] = useState('Heads');
@@ -21,6 +21,25 @@ function Game() {
             .then((result) => {
                 setWinningSide(result['winner']);
             });
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({playerName: location.state.player1Name, side: location.state.player1Side, bet: location.state.player1Bet, wallet: location.state.player1Wallet})
+        };
+        fetch('/addPlayer', requestOptions)
+            .then(res => res.json())
+            .then((result) => console.log(result));
+        // fetch('/findPlayer', requestOptions)
+        //     .then(res => res.json())
+        //     .then((res) => {
+        //         if (res.name !== null) {
+        //             changePlayer2({side: res.side, wallet: res.wallet, name: res.name});
+        //         }
+        //         else {
+        //             setTimeout(() => {setResult(winningSide)}, 5850);
+        //         }
+                
+        //     });
     }, []);
 
     function reset() {
@@ -42,7 +61,7 @@ function Game() {
             <div id="GameMain">
                 <Player name={player1Name} side={player1Side} result={player1Side === result ? '-winner' : ''}/>
                 <CoinFlip animation={result === null ? flipState : 'done'} winningSide={winningSide} image={flipState === 'loading' ? backLoading : backReady}/>
-                {player2Side === null ? <div style={{width: '300px', height: '150px'}}></div> : <Player name="me" side={player1Side === 'Heads' ? 'Tails' : 'Heads'} result={player2Side === result ? '-winner' : ''}/>}
+                {player2.side === null ? <div style={{width: '300px', height: '150px'}}></div> : <Player name={player2.name} side={player2.side} wallet={player2.wallet} result={!result ? '-winner' : ''}/>}
             </div>
             <button className='GameButton' onClick={() => {setTimeout(() => {setResult(winningSide)}, 5850); setFlipState('ready')}}>flip</button>
             <button className='GameButton' onClick={() => {reset()}}>reset</button>

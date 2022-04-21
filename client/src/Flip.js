@@ -55,7 +55,7 @@ function Flip() {
                 <div className='flipRowInput' id="walletInput">0x123456abcdef</div>
             </div>
             {ready ? 
-                <Link state={{player1Name: name, player1Bet: bet, player1Side: (side === 'Choose For Me' ? (Math.floor(Math.random() * 2) === 0 ? 'Heads' : 'Tails') : side)}} id="readyLink" to="/game"><button className="flipRow" id={"readyButton" + (ready ? '-ready' : '')}>Ready</button></Link>
+                <Link state={{player1Name: name, player1Bet: bet, player1Side: (side === 'Choose For Me' ? (Math.floor(Math.random() * 2) === 0 ? 'Heads' : 'Tails') : side), player1Wallet: '0x123abc'}} id="readyLink" to="/game"><button className="flipRow" id={"readyButton" + (ready ? '-ready' : '')}>Ready</button></Link>
                 :
                 <button id={"readyButton" + (ready ? '-ready' : '')}>Ready</button> 
             }

@@ -44,5 +44,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "homepage": "."
+  "proxy": "http://localhost:5000"
 }
