@@ -1,7 +1,10 @@
 .PlayOptions {
     text-align: center;
+    margin: 200px 0;
     font-size: 35px;
-    margin-top: 200px;
+    /* margin-top: 200px; */
+    width: 450px;
+    /* border: 1px solid black; */
 }
 
 .PlayOption {
@@ -10,8 +13,6 @@
     flex-direction: row;
     justify-content: center;
     text-decoration: none;
-    margin-right: 450px;
-    margin-left: 450px;
     transition: all .1s ease-in-out;
 }
 

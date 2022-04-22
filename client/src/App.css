@@ -1,0 +1,10 @@
+.AppBody {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.AppEmptyDiv {
+    width: 300px;
+    margin: 200px 0;
+}

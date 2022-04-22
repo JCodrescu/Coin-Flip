@@ -13,14 +13,25 @@ function Game() {
     const [player2, changePlayer2] = useState({name: null, side: null, wallet: null});
     const [flipState, setFlipState] = useState('loading');
     const [result, setResult] = useState(null);
-    const [winningSide, setWinningSide] = useState('Heads');
+    const [winningSide, setWinningSide] = useState('NA');
 
     useEffect(() => {
-        fetch('/gameWinner')
-            .then(res => res.json())
-            .then((result) => {
-                setWinningSide(result['winner']);
-            });
+        if (player2.name !== null) {
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({playerName: location.state.player1Name, side: location.state.player1Side, bet: location.state.player1Bet, wallet: location.state.player1Wallet})
+            };
+            fetch('/gameWinner', requestOptions)
+                .then(res => res.json())
+                .then((result) => {
+                    console.log("here");
+                    setWinningSide(result.winner);
+                });
+        }
+    }, [player2])
+
+    useEffect(() => {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -28,7 +39,11 @@ function Game() {
         };
         fetch('/addPlayer', requestOptions)
             .then(res => res.json())
-            .then((result) => console.log(result));
+            .then((result) => {
+                if (result.player !== null) {
+                    changePlayer2(result.player);
+                }
+            });
         // fetch('/findPlayer', requestOptions)
         //     .then(res => res.json())
         //     .then((res) => {
@@ -61,7 +76,7 @@ function Game() {
             <div id="GameMain">
                 <Player name={player1Name} side={player1Side} result={player1Side === result ? '-winner' : ''}/>
                 <CoinFlip animation={result === null ? flipState : 'done'} winningSide={winningSide} image={flipState === 'loading' ? backLoading : backReady}/>
-                {player2.side === null ? <div style={{width: '300px', height: '150px'}}></div> : <Player name={player2.name} side={player2.side} wallet={player2.wallet} result={!result ? '-winner' : ''}/>}
+                {player2.name === null ? <div style={{width: '300px', height: '150px'}}></div> : <Player name={player2.name} side={player2.side} wallet={player2.wallet} result={result === player2.side ? '-winner' : ''}/>}
             </div>
             <button className='GameButton' onClick={() => {setTimeout(() => {setResult(winningSide)}, 5850); setFlipState('ready')}}>flip</button>
             <button className='GameButton' onClick={() => {reset()}}>reset</button>

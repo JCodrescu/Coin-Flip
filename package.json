@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cd client && npm i && npm run build && cd ../ && npm i && nodemon start app.js",
-    "quickstart": "cd client && npm start && cd ../ && nodemon start app.js"
+    "quickstart": "nodemon start app.js"
   },
   "keywords": [],
   "author": "",

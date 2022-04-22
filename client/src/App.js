@@ -2,6 +2,7 @@ import { useState } from "react";
 import OverlayMenu from "./OverlayMenu";
 import PlayOptions from "./PlayOptions";
 import Header from "./Header";
+import WaitingPlayers from "./WaitingPlayers";
 import './App.css';
 
 function App() {
@@ -10,7 +11,11 @@ function App() {
     return (
     <div className="app">
         <Header onMenuClick={() => activeMenu(!isMenuActive)}/>
-        <PlayOptions />
+        <div className='AppBody'>
+            <WaitingPlayers />
+            <PlayOptions />
+            <div className="AppEmptyDiv"></div>
+        </div>
         <OverlayMenu 
             isMenuActive={isMenuActive}
             closeMenu={() => activeMenu(false)} 
