@@ -17,8 +17,8 @@
     transition: none;
 }
 
-.coin-flip-loading-Heads, .coin-flip-loading-Tails, .coin-flip-loading-NA{
-    position: relative;
+.coin-flip-loading-Heads, .coin-flip-loading-Tails, .coin-flip-loading-null{
+    position: relative; 
     margin: 10px auto;
     width: 150px;
     height: 150px;
