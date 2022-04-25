@@ -1,6 +1,6 @@
 .WaitingPlayers {
     border-right: 2px solid black;
-    width: 300px;
+    width: 350px;
     height: 500px;
     margin: 50px 0;
     scroll-behavior: smooth;
@@ -15,7 +15,7 @@
 }
 
 .WaitingPlayer {
-    margin: 10px;
+    margin: 10px 0;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -23,14 +23,13 @@
     height: 30px;
 }
 
-.WaitingPlayerName {
-    width: 125px;
+.WaitingPlayerText{
+    width: 100px;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-
-.WaitingPlayerBet {
-    width: 75px;
-
-}
+/* 
+.WaitingPlayerBet, .WaitingPlayerSide {
+    width: 100px;
+} */

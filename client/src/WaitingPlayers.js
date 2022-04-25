@@ -4,8 +4,8 @@ import './WaitingPlayers.css';
 function Player(props) {
     return (
         <div className='WaitingPlayer'>
-            <div className='WaitingPlayerName'>{props.name}</div>
-            <div className='WaitingPlayerBet'>bet:  ${props.bet}</div>
+            <div className='WaitingPlayerText'>{props.name}</div>
+            <div className='WaitingPlayerText'>{props.side} ${props.bet}</div>
         </div>
     )
 }
@@ -35,7 +35,7 @@ function WaitingPlayers() {
             .then((result) => {
                 for (let i=0; i < result.players.length; i++) {
                     let player = result.players[i];
-                    players.push(<Player name={player.name} bet={player.bet} key={player.name}/>);
+                    players.push(<Player name={player.name} bet={player.bet} side={player.side} key={player.name}/>);
                     console.log(player);
                 }
             });

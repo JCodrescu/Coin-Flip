@@ -29,99 +29,128 @@ function Game() {
                                                 'p1': {'name': location.state.player1Name, 'side': location.state.player1Side, 'wallet': location.state.player1Wallet}, 
                                                 'p2': {'name': null, 'side': null, 'wallet': null}, 
                                                 'bet': location.state.player1Bet,
-                                                'winningSide': null
+                                                'winningSide': null,
+                                                'gameID': null
                                                 });
     const [gameFinished, setGameFinished] = useState(false);
 
-    useEffect(() => {
-        const interval = setInterval(async () => {
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({name: gameData.p1.name, side: gameData.p1.side, bet: gameData.bet, wallet: gameData.p1.wallet})
-            };
-            fetch('/updateTime', requestOptions);
-        }, 10000);
+    // useEffect(() => {
+    //     const interval = setInterval(async () => {
+    //         console.log(gameData);
+    //         const requestOptions = {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({'gameID': gameData.gameID})
+    //         };
+    //         fetch('/updateTime', requestOptions).then(result => console.log("time updated"));
+    //     }, 5000);
       
-        return () => clearInterval(interval);
-    }, []);
+    //     return () => clearInterval(interval);
+    // }, [gameData]);
 
     async function loadGame() {
-        const requestOptions = {
+        let requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({name: gameData.p1.name, side: gameData.p1.side, bet: gameData.bet, wallet: gameData.p1.wallet})
+            body: JSON.stringify({"gameID": gameData.gameID})
         };
+        let tempGameData = null;
         fetch('/otherPlayerData', requestOptions)
                 .then(otherPlayerData => otherPlayerData.json())
                 .then((otherPlayerData) => {
-                    console.log(otherPlayerData);
-                    if (otherPlayerData.name === null) { // if no other player has joined recall this function in 1 second
-                        console.log("other player not found");
+                    if (otherPlayerData.name === null) { // if no other player has joined recall this function in 3 seconds
                         setTimeout(loadGame, 3000);
                     }
-                    else { 
-                        console.log("player found");
+                    else { // other player was found so begin game
                         setTimeout(() => {setGameFinished(true)}, 6000);
                         let requestOptions = {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({'p1': {name: gameData.p1.name, side: gameData.p1.side, wallet: gameData.p1.wallet}, 'p2': {name: otherPlayerData.name, side: otherPlayerData.side, wallet: otherPlayerData.wallet}, 'bet': gameData.bet})
+                            body: JSON.stringify({'gameID': gameData.gameID})
                         };
                         fetch('/getWinner', requestOptions) // get winner returns the winner of the game
                             .then(winningSide => winningSide.json())
                             .then((winningSide) => {
-                                changeGameData({
+                                tempGameData = {
                                     'p1': {'name': gameData.p1.name, 'side': gameData.p1.side, 'wallet': gameData.p1.wallet}, 
                                     'p2': {'name': otherPlayerData.name, 'side': otherPlayerData.side, 'wallet': otherPlayerData.wallet}, 
                                     'bet': gameData.bet,
-                                    'winningSide': winningSide.side
-                                })
+                                    'winningSide': winningSide.side,
+                                    'gameID': gameData.gameID
+                                };
                             })
                             .then(() => {
                                 fetch('/endGame', requestOptions); // end game removes the game from the servers database
                             })
+                            .then(() => {
+                                changeGameData(tempGameData);
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                window.location.href = "/";
+                            })
                         
                     }
+                })
+                .catch(err => {
+                    console.log(err);
+                    window.location.href = "/";
                 })
     }
 
     useEffect(() => {
-        async function startGame() {
+        if (gameData.gameID === null) {
             let requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({name: gameData.p1.name, side: gameData.p1.side, bet: gameData.bet, wallet: gameData.p1.wallet})
             };
-            await fetch('/addPlayer', requestOptions)
+            fetch('/addPlayer', requestOptions)
                 .then(res => res.json())
                 .then((otherPlayerData) => {
-                    if (otherPlayerData.name === null) { // if no other player has joined then this client is 'p1'
-                        setTimeout(loadGame, 1000);
-                    }
-                    else { // if other player has joined then this client is 'p2'
-                        setTimeout(() => {setGameFinished(true)}, 6000);
-                        let requestOptions = {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({'p1': {name: otherPlayerData.name, side: otherPlayerData.side, wallet: otherPlayerData.wallet}, 'p2': {name: gameData.p1.name, side: gameData.p1.side, wallet: gameData.p1.wallet}, 'bet': gameData.bet})
-                        };
-                        fetch('/decideWinner', requestOptions) // decide winner initiates the money transfer and returns the winning side
-                            .then(winningSide => winningSide.json())
-                            .then((winningSide) => {
-                                changeGameData({
-                                    'p1': {'name': gameData.p1.name, 'side': gameData.p1.side, 'wallet': gameData.p1.wallet}, 
-                                    'p2': {'name': otherPlayerData.name, 'side': otherPlayerData.side, 'wallet': otherPlayerData.wallet}, 
-                                    'bet': gameData.bet,
-                                    'winningSide': winningSide.side
-                                })
-                            });
-                    }
+                    changeGameData({
+                        'p1': {'name': gameData.p1.name, 'side': gameData.p1.side, 'wallet': gameData.p1.wallet}, 
+                        'p2': {'name': otherPlayerData.name, 'side': otherPlayerData.side, 'wallet': otherPlayerData.wallet}, 
+                        'bet': gameData.bet,
+                        'winningSide': null,
+                        'gameID': otherPlayerData.gameID
+                    });
                 })
+                .catch(err => {
+                    console.log(err);
+                    window.location.href = "/";
+                    return;
+                });
         }
-        startGame();
-    }, [])
-
+        else if (gameData.p2.name === null) { // this client is p1
+            setTimeout(loadGame, 3000);
+        }
+        else if (gameData.winningSide === null){ // this client is p2
+            setTimeout(() => {setGameFinished(true)}, 6000);
+            let requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({'gameID': gameData.gameID})
+            };
+            fetch('/decideWinner', requestOptions) // decide winner initiates the money transfer and returns the winning side
+                .then(winningSide => winningSide.json())
+                .then((winningSide) => {
+                    changeGameData({
+                        'p1': {'name': gameData.p1.name, 'side': gameData.p1.side, 'wallet': gameData.p1.wallet}, 
+                        'p2': {'name': gameData.p2.name, 'side': gameData.p2.side, 'wallet': gameData.p2.wallet}, 
+                        'bet': gameData.bet,
+                        'winningSide': winningSide.side,
+                        'gameID': gameData.gameID
+                    })
+                })
+                .catch(err => {
+                    console.log(err);
+                    window.location.href = "/";
+                    return;
+                });
+        }
+    }, [gameData]);
+    
     return (
         <div id="Game">
             <div className="GamePrize">
