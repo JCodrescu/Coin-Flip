@@ -48,67 +48,11 @@ app.post('/addPlayer', (req, res) => {
         })
         .catch(err => { 
             if (err.code === '23505') {
-                res.status(500).json({'result': 'username taken'});
+                res.json({'result': 'username taken'});
             }
             else {
                 res.status(500).json({'result': `error: ${err}`})
             }
-            
-        })
-})
-
-app.post('/getPlayerGame', (req, res) => {
-    const {name} = req.body;
-    if (!name) {
-        res.status(400).json({'error': 'please include necessary body'});
-        return;
-    }
-    client
-        .query(
-            "select * from Players where name = $1",
-            [name])
-        .then(result => {
-            if (result.rows.length === 1) {
-                if (result.rows[0].gameid) {
-                    return client.query(
-                        `select *
-                        from Games 
-                            left join Players on Games.p2 = Players.name
-                        where id = $1
-                        `,
-                        [result.rows[0].gameid]
-                    );
-                }
-                else {
-                    return result;
-                }
-            }
-            else {
-                return result;
-            }
-        })
-        .then(result => {
-            if (result.rows.length === 1) { // player exists, game may or may not exist
-                if (result.rows[0].id) { // if id is a field, then the game exists (this is because the left join query must of been run is id is a field)
-                    res.json({
-                        'found': true, 
-                        'gameID': result.rows[0].id,
-                        "winner": result.rows[0].winner,
-                        'p2': result.rows[0].p2 ? {'name': result.rows[0].name, 'side': result.rows[0].side, 'wallet': result.rows[0].wallet} 
-                                                : {'name': null, 'side': null, 'wallet': null}
-                    })
-                }
-                else { // the game does not exist
-                    res.json({'found': true, "gameID": null});
-                }
-            }
-            else { // player does not exist
-                res.json({'found': false})
-            }
-        })
-        .catch(err => {
-            console.error("error while querying:", err);
-            res.status(500).json({'error': `Database failed while querying: ${err}`});
         })
 });
 
@@ -124,7 +68,7 @@ app.post('/joinGame', (req, res) => {
     client
         .query('begin')
         .then(result => {
-            return client.query(
+            return client.query( // find player data from given name (used to make sure the player exists)
                 `select *
                 from Players
                 where name = $1`,
@@ -132,11 +76,12 @@ app.post('/joinGame', (req, res) => {
             );
         })
         .then(result => {
-            if (result.rows.length === 1) {
+            if (result.rows.length === 1) {// if player exists, check if there is a game to join
                 return client.query(
                     `select * 
                     from Games join Players on Games.p1 = Players.name
                     where Games.p2 is null
+                    and Players.name <> $1
                     and Players.side <> $2
                     and Players.bet = $3`,
                     [result.rows[0].name, result.rows[0].side, result.rows[0].bet]
@@ -147,16 +92,10 @@ app.post('/joinGame', (req, res) => {
             }
         })
         .then(result => {
-            if (result === "player doesn't exist") {
+            if (result === "player doesn't exist") { 
                 return "player doesn't exist";
             }
-            if (result.rows.length > 0 && result.rows[0].name === name) {
-                gameID = result.rows[0].id;
-                console.log("here")
-                response = {'name': name, 'wallet': result.rows[0].wallet, 'side': result.rows[0].side, 'gameID': result.rows[0].id, 'winner': winner};
-                return;
-            }
-            if (result.rows.length > 0) {
+            if (result.rows.length > 0) { // if there is a game available to join, join it
                 winner = Math.floor(Math.random() * 2) % 2 === 0 ? 'Heads' : 'Tails' // decide winner here
                 response = {'name': result.rows[0].name, 'wallet': result.rows[0].wallet, 'side': result.rows[0].side, 'gameID': result.rows[0].id, 'winner': winner};
                 return client.query(
@@ -164,7 +103,7 @@ app.post('/joinGame', (req, res) => {
                     [name, winner, result.rows[0].id]
                 );
             }
-            else {
+            else { // if no game are a match then create a new one
                 gameID = game;
                 game++;
                 if (game > 10000) game = 1;
@@ -179,7 +118,7 @@ app.post('/joinGame', (req, res) => {
             if (result === "player doesn't exist") {
                 return "player doesn't exist";
             }
-            return client.query(
+            return client.query( // update the player data to store the game id
                 'update Players set gameID = $1 where name = $2',
                 [gameID, name]
             )
@@ -193,6 +132,7 @@ app.post('/joinGame', (req, res) => {
         .then(result => { 
             if (result === "player doesn't exist") {
                 res.status(400).json({'error': 'Player does not exist'});
+                return client.query("rollback");
             }
             else {
                 if (response.name) {
@@ -214,28 +154,34 @@ app.post('/joinGame', (req, res) => {
         });
 });
 
-// app.post('/decideWinner', (req, res) => {
-//     const {gameID} = req.body;
-//     if (!gameID) {
-//         res.status(400).json({'error': 'please include necessary body'});
-//         return;
-//     }
-//     client
-//         .query('select * from Games where id = $1',
-//             [gameID])
-//         .then(result => {
-//             if (result.rows.length === 1) {
-//                 console.log('initiating money transfer');
-//                 res.json({'side': result.rows[0].winner});
-//             }
-//             else {
-//                 res.status(400).json({'error': 'Game doesnt exist'});
-//             }
-//         })
-//         .catch(err => {
-//             res.status(500).json({'error': `database failed on winner query: ${err}`});
-//         });    
-// });
+app.post('/checkGameState', (req, res) => { // used for p1 to poll until another player has joined the game
+    const {gameID} = req.body;
+    if (!gameID) {
+        res.status(400).json({'error': 'please include necessary body'});
+        return;
+    }
+    client
+        .query(`select p2, name, side, wallet, winner
+                from Games 
+                    left join Players on Games.p2 = Players.name
+                where Games.id = ${gameID}`)
+        .then(result => {
+            if (result.rows.length === 1) { // game exists
+                if (result.rows[0].p2) { // p2 has joined in
+                    res.json({'name': result.rows[0].name, 'wallet': result.rows[0].wallet, 'side': result.rows[0].side, 'winner': result.rows[0].winner});
+                }
+                else { // no other player has joined yet
+                    res.json({'name': null, 'wallet': null, 'side': null});
+                }
+            }
+            else { // game does not exist
+                res.status(400).json({'error': "game doesn't exist"});
+            }
+        })
+        .catch(err => {
+            res.status(500).json({'error': `error on game query: ${err}`});
+        })
+})
 
 app.post('/getWinner', (req, res) => {
     const {gameID} = req.body;
@@ -261,7 +207,7 @@ app.post('/getWinner', (req, res) => {
     }
 );
 
-app.post('/endGame', (req, res) => {
+app.post('/endGame', (req, res) => { // p1 should call this to clear the game once they discover that it started
     const {name, gameID} = req.body;
     if (!gameID || !name) {
         res.status(400).json({'error': 'please include necessary body'});
@@ -283,7 +229,7 @@ app.post('/endGame', (req, res) => {
     res.json({"result": "success"});
 });
 
-app.get('/clearTable', (req, res) => {
+app.get('/clearTable', (req, res) => { // for management purposes
     client.query(`
         drop table if exists Games;
         drop table if exists Players;
@@ -310,7 +256,7 @@ app.get('/clearTable', (req, res) => {
     res.send("success");
 });
 
-app.get('/findWaiting', (req, res) => {
+app.get('/findWaiting', (req, res) => { // used to show all open game on the homescreen
     client
         .query(`select name, side, bet
                 from Games join Players on Games.p1 = Players.name

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OverlayMenu from "./OverlayMenu";
 import './Flip.css';
 import Header from "./Header";
-import { Link, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 function Flip(props) {
     const [isMenuActive, activeMenu] = useState(false);
@@ -10,38 +10,67 @@ function Flip(props) {
     const [bet, changeBet] = useState(null);
     const [side, changeSide] = useState('Choose For Me');
     const [wallet, changeWallet] = useState("0x123abc");
-    const [startGame, setStartGame] = useState(false);
+    const [game, setGame] = useState(null);
+    const [loading, setLoading] = useState(false);
     let ready = false;
 
     if (name !== null && bet !== null) {
         ready = true;
     }
 
-    function addPlayer() {
+    async function joinGame() {
         let requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({name: name, side: side, bet: bet, wallet: wallet})
         };
         fetch("/addPlayer", requestOptions)
-        .then(result => result.json())
-        .then(result => {
-            if (result.result === "success") {
-                setStartGame(true);
-            }
-            else if (result.result == "username taken") {
-                alert("username taken");
-                changeName(null);
-            }
-            else {
-                console.log("herebaby")
-                changeName(null);
-            }
-        })
+            .then(result => result.json())
+            .then(result => {
+                if (result.result === "success") {
+                    return fetch('/joinGame', requestOptions);
+                }
+                else if (result.result === "username taken") {
+                    alert("username taken");
+                    changeName(null);
+                    setLoading(false);
+                    return null;
+                }
+                else {
+                    alert("an error happened");
+                    changeName(null);
+                    setLoading(false);
+                    return null;
+                }
+            })
+            .then(result => {
+                if (!result) return null;
+                return result.json();
+            })
+            .then(result => {
+                if (!result) return null;
+                let game = {
+                    'p1': {'name': name, 'side': side, 'wallet': wallet},
+                    'p2': {'name': result.name, 'side': result.side, 'wallet': result.wallet},
+                    'bet': bet,
+                    'winner': result.winner,
+                    'gameID': result.gameID
+                }
+                setGame(game);
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
+    useEffect(() => {
+        if (loading) {
+            joinGame();
+        }
+    }, [loading]);
+
     return (
-        !startGame ?
+        !game ?
         <div>
             <Header onMenuClick={() => activeMenu(!isMenuActive)}/>
             <OverlayMenu 
@@ -81,13 +110,18 @@ function Flip(props) {
                     <div className='flipRowInput' id="walletInput">{wallet !== null ? wallet : "Connect Wallet"}</div>
                 </div>
                 {ready ?  
-                    <button onClick={() => {addPlayer()}} className="flipRow" id={"readyButton" + (ready ? '-ready' : '')}>Ready</button>
+                    <button onClick={() => {setLoading(true)}} className="flipRow" id={"readyButton" + (ready ? '-ready' : '')}>Ready</button>
                     :
                     <button id={"readyButton" + (ready ? '-ready' : '')}>Ready</button> 
                 }
+                {loading ?
+                    <div>loading</div>
+                    :
+                    null
+                }
             </div>
         </div>
-        : <Navigate state={{'name': name, 'side': side, 'wallet': "0x123abc", 'bet': bet}} id="readyLink" to="/game" />
+        : <Navigate state={game} id="readyLink" to="/game" />
     )
 }
 
