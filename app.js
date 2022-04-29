@@ -27,175 +27,215 @@ if (process.env.NODE_ENV !== 'production') {
 } })();
 client.connect();
 
-let game = 0;
-client.query('truncate table game;', (err, result) => {
+let game = 1;
+client.query('truncate table Games; truncate table Players', (err, result) => {
         if (err) throw err;
     }
 );
 
-
-// add player checks if a game exists where the player can join, else create a new game
 app.post('/addPlayer', (req, res) => {
-    const {name, side, bet, wallet} = req.body;
-    if (name === null || side === null || bet === null || wallet === null) {
+    const {name, wallet, side, bet} = req.body;
+    if (!name || !side || !bet || !wallet) {
         res.status(400).json({'error': 'please include necessary body'});
         return;
     }
-    let gameID = -1;
-    let op = null;
-    let response = {'error': 'this didnt work like i thought it would'};
+    client
+        .query(
+            'insert into Players (name, side, wallet, bet, gameID, created) values ($1, $2, $3, $4, null, $5)',
+            [name, side, wallet, bet, new Date()])
+        .then(result => {
+            res.json({'result': 'success'});
+        })
+        .catch(err => { 
+            if (err.code === '23505') {
+                res.status(500).json({'result': 'username taken'});
+            }
+            else {
+                res.status(500).json({'result': `error: ${err}`})
+            }
+            
+        })
+})
+
+app.post('/getPlayerGame', (req, res) => {
+    const {name} = req.body;
+    if (!name) {
+        res.status(400).json({'error': 'please include necessary body'});
+        return;
+    }
+    client
+        .query(
+            "select * from Players where name = $1",
+            [name])
+        .then(result => {
+            if (result.rows.length === 1) {
+                if (result.rows[0].gameid) {
+                    return client.query(
+                        `select *
+                        from Games 
+                            left join Players on Games.p2 = Players.name
+                        where id = $1
+                        `,
+                        [result.rows[0].gameid]
+                    );
+                }
+                else {
+                    return result;
+                }
+            }
+            else {
+                return result;
+            }
+        })
+        .then(result => {
+            if (result.rows.length === 1) { // player exists, game may or may not exist
+                if (result.rows[0].id) { // if id is a field, then the game exists (this is because the left join query must of been run is id is a field)
+                    res.json({
+                        'found': true, 
+                        'gameID': result.rows[0].id,
+                        "winner": result.rows[0].winner,
+                        'p2': result.rows[0].p2 ? {'name': result.rows[0].name, 'side': result.rows[0].side, 'wallet': result.rows[0].wallet} 
+                                                : {'name': null, 'side': null, 'wallet': null}
+                    })
+                }
+                else { // the game does not exist
+                    res.json({'found': true, "gameID": null});
+                }
+            }
+            else { // player does not exist
+                res.json({'found': false})
+            }
+        })
+        .catch(err => {
+            console.error("error while querying:", err);
+            res.status(500).json({'error': `Database failed while querying: ${err}`});
+        })
+});
+
+app.post('/joinGame', (req, res) => {
+    const {name} = req.body;
+    if (!name) {
+        res.status(400).json({'error': 'please include necessary body'});
+        return;
+    }
+    let gameID = null;
+    let response = null;
 
     client
-        .query("begin") // begin transaction to avoid race conditions when starting/joining games
-        .then(res => {
-            // first check for an open game
+        .query('begin')
+        .then(result => {
             return client.query(
-                "select * from Game where p2_name is null and bet = $1 and p1_side <> $2",
-                [bet, side]);
+                `select *
+                from Players
+                where name = $1`,
+                [name]
+            );
         })
         .then(result => {
-            // if there is an available game, join it
-            if (result.rows.length > 0) {
-                op = result.rows[0];
-                gameID = op.gameid;
-                response = {'name': op.p1_name, 'wallet': op.p1_wallet, 'side': op.p1_side, 'gameID': gameID};
-                return client.query('update Game set p2_name = $1, p2_side = $2, p2_wallet = $3, gametime = $4 where gameID = $5',
-                    [name, side, wallet, new Date(), gameID]);
+            if (result.rows.length === 1) {
+                return client.query(
+                    `select * 
+                    from Games join Players on Games.p1 = Players.name
+                    where Games.p2 is null
+                    and Players.side <> $2
+                    and Players.bet = $3`,
+                    [result.rows[0].name, result.rows[0].side, result.rows[0].bet]
+                );
             }
-            // if there are no available games, start a new one
             else {
-                game += 1;
-                gameID = game;
-                response = {'name': null, 'wallet': null, 'side': null, 'gameID': gameID};
-                if (game > 1000000) game = 1;
-                return client.query('insert into Game (p1_name, p1_side, p1_wallet, p2_name, p2_side, p2_wallet, bet, winner, gametime, gameID) values ($1, $2, $3, null, null, null, $4, $5, $6, $7);', 
-                    [name, side, wallet, bet, (Math.floor(Math.random() * 2) % 2 === 0 ? 'Heads' : 'Tails'), new Date(), game]);
+                return "player doesn't exist";
             }
         })
         .then(result => {
-            // once that's done, run the commit statement to
-            // complete the transaction
+            if (result === "player doesn't exist") {
+                return "player doesn't exist";
+            }
+            if (result.rows.length > 0 && result.rows[0].name === name) {
+                gameID = result.rows[0].id;
+                console.log("here")
+                response = {'name': name, 'wallet': result.rows[0].wallet, 'side': result.rows[0].side, 'gameID': result.rows[0].id, 'winner': winner};
+                return;
+            }
+            if (result.rows.length > 0) {
+                winner = Math.floor(Math.random() * 2) % 2 === 0 ? 'Heads' : 'Tails' // decide winner here
+                response = {'name': result.rows[0].name, 'wallet': result.rows[0].wallet, 'side': result.rows[0].side, 'gameID': result.rows[0].id, 'winner': winner};
+                return client.query(
+                    'update Games set p2 = $1, winner = $2 where id = $3',
+                    [name, winner, result.rows[0].id]
+                );
+            }
+            else {
+                gameID = game;
+                game++;
+                if (game > 10000) game = 1;
+                response = {'name': null, 'wallet': null, 'side': null, 'gameID': gameID, 'winner': null};
+                return client.query(
+                    'insert into Games (p1, p2, winner, id) values ($1, null, null, $2)',
+                    [name, gameID]
+                );
+            }
+        })
+        .then(result => {
+            if (result === "player doesn't exist") {
+                return "player doesn't exist";
+            }
+            return client.query(
+                'update Players set gameID = $1 where name = $2',
+                [gameID, name]
+            )
+        })
+        .then(result => {
+            if (result === "player doesn't exist") {
+                return "player doesn't exist";
+            }
             return client.query("commit");
         })
-        .then((result) => {
-            // if the transaction completes successfully
-            // log a confirmation statement
-            console.log("transaction completed");
-            res.json(response);
+        .then(result => { 
+            if (result === "player doesn't exist") {
+                res.status(400).json({'error': 'Player does not exist'});
+            }
+            else {
+                if (response.name) {
+                    console.log("money transfer happening!"); // transfer money here
+                }
+                else {
+                    console.log("new game. no money transfer yet.");
+                }
+                res.json(response);
+            }
         })
         .catch((err) => {
-            // incase there are any errors encountered
-            // rollback the transaction
-            console.error("error while querying:", err);
-            res.status(500).json({'error': 'Game data was not stored. Please try again.'});
+            res.status(500).json({'error': `Game was not created. Please try again. Error: ${err}`});
             return client.query("rollback");
         })
         .catch((err) => {
             // incase there is an error when rolling back, log it
-            console.error("error while rolling back transaction:", err);
-            res.status(500).json({'error': 'database failed'});
+            res.status(500).json({'error': `error while rolling back transaction: ${err}`});
         });
-    }
-);
+});
 
-    // // check if you can add player into an existing game
-    // client.query('select * from Game where p2_name is null and bet = $1 and p1_side <> $2',
-    //     [bet, side],
-    //     (err, result) => {
-    //         if (err) throw err;
-    //         if (result.rows.length > 0) {
-    //             console.log('adding player to game');
-    //             let op = result.rows[0];
-    //             // add player to existing game
-    //             client.query('update Game set p2_name = $1, p2_side = $2, p2_wallet = $3, gametime = $4 where p1_name = $5 and p1_side = $6 and p1_wallet = $7',
-    //                 [name, side, wallet, new Date(), op.p1_name, op.p1_side, op.p1_wallet],
-    //                 (err, result) => {
-    //                     if (err) throw err;
-    //                 }
-    //             );
-    //             res.json({'name': op.p1_name, 'wallet': op.p1_wallet, 'side': op.p1_side});
-    //         }
-    //         else {
-    //             // start new game
-    //             client.query('insert into Game (p1_name, p1_side, p1_wallet, p2_name, p2_side, p2_wallet, bet, winner, gametime) values ($1, $2, $3, null, null, null, $4, $5, $6);', 
-    //                 [name, side, wallet, bet, (Math.floor(Math.random() * 2) % 2 === 0 ? 'Heads' : 'Tails'), new Date()],
-    //                 (err, result) => {
-    //                     if (err) throw err;
-    //                     console.log('starting new game');
-    //                     res.json({'name': null, 'wallet': null, 'side': null}) // to signify that the game is not ready
-    //                 }
-    //             );
-    //         }
-    //     }
-
-app.post('/otherPlayerData', (req, res) => {
-    const {gameID} = req.body;
-    if (!gameID) {
-        res.status(400).json({'error': 'please include necessary body'});
-        return;
-    }
-    client
-        .query('select * from Game where gameID = $1;', 
-            [gameID])
-        .then(result => {
-            if (result.rows.length === 1) {
-                const gameRow = result.rows[0];
-                res.json({'name': gameRow.p2_name, 'wallet': gameRow.p2_wallet, 'side': gameRow.p2_side});
-            }
-            else {
-                res.status(500).json({'error': 'This game has multiple instances. Please try again in 5 minutes.'});
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({'error': 'database lookup failed'});
-        })
-    }
-);
-
-app.post('/updateTime', (req, res) => {
-    const {gameID} = req.body;
-    if (!gameID) {
-        res.status(400).json({'error': 'please include game id in body of request'});
-        return;
-    }
-    client
-        .query('update Game set gametime = $1 where gameID = $2',
-            [new Date(), gameID])
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({'error': 'database failed on update time'});
-            }
-        );
-    res.json({"result": "success"});
-    }
-);
-
-app.post('/decideWinner', (req, res) => {
-    const {gameID} = req.body;
-    if (!gameID) {
-        res.status(400).json({'error': 'please include necessary body'});
-        return;
-    }
-    client
-        .query('select * from Game where gameID = $1',
-            [gameID])
-        .then(result => {
-            if (result.rows.length > 0) {
-                console.log('initiating money transfer');
-                let gameData = result.rows[0];
-                res.json({'side': gameData.winner});
-            }
-            else {
-                res.status(400).json({'error': 'Game doesnt exist'});
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({'error': 'database failed on winner lookup'});
-        });
-    }
-);
+// app.post('/decideWinner', (req, res) => {
+//     const {gameID} = req.body;
+//     if (!gameID) {
+//         res.status(400).json({'error': 'please include necessary body'});
+//         return;
+//     }
+//     client
+//         .query('select * from Games where id = $1',
+//             [gameID])
+//         .then(result => {
+//             if (result.rows.length === 1) {
+//                 console.log('initiating money transfer');
+//                 res.json({'side': result.rows[0].winner});
+//             }
+//             else {
+//                 res.status(400).json({'error': 'Game doesnt exist'});
+//             }
+//         })
+//         .catch(err => {
+//             res.status(500).json({'error': `database failed on winner query: ${err}`});
+//         });    
+// });
 
 app.post('/getWinner', (req, res) => {
     const {gameID} = req.body;
@@ -204,81 +244,91 @@ app.post('/getWinner', (req, res) => {
         return;
     }
     client
-        .query('select * from Game where gameID = $1',
+        .query('select * from Games where id = $1',
             [gameID])
         .then(result => {
-            if (result.rows.length > 0) {
+            if (result.rows.length === 1) {
                 console.log('no money transfer here');
-                let gameData = result.rows[0];
-                res.json({'side': gameData.winner});
+                res.json({'side': result.rows[0].winner});
             }
             else {
                 res.status(400).json({'error': 'Game doesnt exist'});
             }
         })
         .catch(err => {
-            console.log(err);
-            res.status(500).json({'error': 'database failed on winner lookup'});
+            res.status(500).json({'error': `database failed on winner query: ${err}`});
         });
     }
 );
 
 app.post('/endGame', (req, res) => {
-    const {gameID} = req.body;
-    if (!gameID) {
+    const {name, gameID} = req.body;
+    if (!gameID || !name) {
         res.status(400).json({'error': 'please include necessary body'});
         return;
     }
     client
-        .query('delete from Game where gameID = $1',
+        .query(
+            'delete from Games where id = $1',
             [gameID])
+        .then(result => {
+            return client.query(
+                'delete from Players where name = $1',
+                [name]
+            )
+        })
         .catch(err => {
-            console.log(err);
-            res.status(500).json({'error': 'database delete failed'});
+            res.status(500).json({'error': `database delete failed: ${err}`});
         });
     res.json({"result": "success"});
-    }
-);
+});
 
 app.get('/clearTable', (req, res) => {
-    client.query('truncate table game;', (err, result) => {
-    if (err) throw err;
-    });
-    // client.query('drop table if exists Game');
-    // client.query(`create table Game (
-    //     p1_name varchar (100) not null,
-    //     p1_side varchar(100) not null, 
-    //     p1_wallet varchar(100) not null, 
-    //     p2_name varchar (100),
-    //     p2_side varchar(100), 
-    //     p2_wallet varchar(100), 
-    //     bet integer not null, 
-    //     winner varchar(100) not null,
-    //     gametime timestamp not null,
-    //     gameID int primary key); `);
-    // res.send('Success');
+    client.query(`
+        drop table if exists Games;
+        drop table if exists Players;
+        
+        create table Players (
+        name varchar (100) primary key,
+        side varchar(10) not null, 
+        wallet varchar(100) not null, 
+        bet integer not null, 
+        gameID integer unique,
+        created timestamp not null
+        ); 
+        
+        create table Games (
+        p1 varchar(100) not null,
+        p2 varchar(100),
+        winner varchar(10),
+        id integer primary key
+        ); `, 
+        (err, result) => {
+            if (err) throw err;
+        }
+    );
+    res.send("success");
 });
 
 app.get('/findWaiting', (req, res) => {
-    let players = []
     client
-        .query('select p1_name, p1_side, bet from Game where p2_name is null;')
+        .query(`select name, side, bet
+                from Games join Players on Games.p1 = Players.name
+                where p2 is null`)
         .then(result => {
+            let players = []
             for (let row of result.rows) {
-                players.push({'name': row.p1_name, 'bet': row.bet, 'side': row.p1_side, 'gameID': row.gameId});
+                players.push({'name': row.name, 'bet': row.bet, 'side': row.side});
             }
             res.json({'players': players});
         })
         .catch(err => {
-            console.log(err);
-            res.status(500).json({'error': 'database failed on waiting player lookup'});
+            res.status(500).json({'error': `database failed on waiting player lookup: ${err}`});
         })
-    }
-);
+});
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
-    }
-);
+});
 
 app.listen(port, () => {console.log(`listening on port ${port}`)});

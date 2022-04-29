@@ -1,7 +1,5 @@
-import React from 'react';
 import App from './App';
-import { BrowserRouter, Routes, Route, } from "react-router-dom";
-import Hamburger from './Hamburger';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Flip from './Flip';
 import Game from './Game';
 
@@ -11,12 +9,12 @@ function Router() {
             <Routes>
                 <Route path="/" element={<App />} />
                 <Route path="flip" element={<Flip />} />
-                <Route path="create" element={<Hamburger />} />
-                <Route path="join" element={<Hamburger />} />
+                <Route path="create" element={<Navigate to="/" />} />
+                <Route path="join" element={<Navigate to="/" />} />
                 <Route path="game" element={<Game />} />
             </Routes>
-        </BrowserRouter>    
+        </BrowserRouter>
     );
-}
+};
 
 export default Router;
