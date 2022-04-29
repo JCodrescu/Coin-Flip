@@ -183,30 +183,6 @@ app.post('/checkGameState', (req, res) => { // used for p1 to poll until another
         })
 })
 
-app.post('/getWinner', (req, res) => {
-    const {gameID} = req.body;
-    if (!gameID) {
-        res.status(400).json({'error': 'please include necessary body'});
-        return;
-    }
-    client
-        .query('select * from Games where id = $1',
-            [gameID])
-        .then(result => {
-            if (result.rows.length === 1) {
-                console.log('no money transfer here');
-                res.json({'side': result.rows[0].winner});
-            }
-            else {
-                res.status(400).json({'error': 'Game doesnt exist'});
-            }
-        })
-        .catch(err => {
-            res.status(500).json({'error': `database failed on winner query: ${err}`});
-        });
-    }
-);
-
 app.post('/endGame', (req, res) => { // p1 should call this to clear the game once they discover that it started
     const {name, gameID} = req.body;
     if (!gameID || !name) {
@@ -256,7 +232,7 @@ app.get('/clearTable', (req, res) => { // for management purposes
     res.send("success");
 });
 
-app.get('/findWaiting', (req, res) => { // used to show all open game on the homescreen
+app.get('/findWaiting', (req, res) => { // used to show all open games on the homescreen
     client
         .query(`select name, side, bet
                 from Games join Players on Games.p1 = Players.name
