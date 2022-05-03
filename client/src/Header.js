@@ -5,7 +5,7 @@ import './Header.css'
 function StartHeader(props) {
     return (
         <div className='StartHeader'>
-            <div className='emptyDiv'></div>
+            <div className='HeaderEmptyDiv'></div>
             <a id="StartLogo" href='/'>
                 <div className='StartLogo'>
                     <CoinLogo width="68" height="68" class="CoinLogo"/>

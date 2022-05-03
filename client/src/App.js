@@ -12,7 +12,7 @@ function App() {
     <div className="app">
         <Header onMenuClick={() => activeMenu(!isMenuActive)}/>
         <div className='AppBody'>
-            <WaitingPlayers />
+            <WaitingPlayers className="WaitingPlayers"/>
             <PlayOptions />
             <div className="AppEmptyDiv"></div>
         </div>

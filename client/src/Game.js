@@ -12,6 +12,7 @@ function Game() {
     const location = useLocation();
     const [gameData, changeGameData] = useState(location.state ? location.state : null);
     const [gameFinished, setGameFinished] = useState(false);
+    const [startFlip, setStartFlip] = useState(false)
 
     async function loadGame() {
         let requestOptions = {
@@ -19,6 +20,7 @@ function Game() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({gameID: gameData.gameID})
         };
+        console.log(gameData.gameID)
         fetch('/checkGameState', requestOptions)
             .then(result => result.json())
             .then(result => {
@@ -53,7 +55,8 @@ function Game() {
             setTimeout(loadGame, 3000); // this client is p1, so schedule the polling for p2 to join
         }
         else if (gameData.winner) {
-            setTimeout(() => {setGameFinished(true)}, 6000);
+            setTimeout(() => {setStartFlip(true)}, 3000);
+            setTimeout(() => {setGameFinished(true)}, 8000);
         }
     }, [gameData]);
 
@@ -66,15 +69,16 @@ function Game() {
             </div>
             <div id="GameMain">
                 <Player name={gameData.p1.name} side={gameData.p1.side} result={gameFinished ? (gameData.winner === gameData.p1.side ? '-winner' : '') : ''}/>
-                <CoinFlip animation={gameFinished ? 'done' : (gameData.winner === null ? 'loading' : 'ready')} winningSide={gameData.winner} image={gameData.winner === null ? coinLoading : coinReady}/>
+                <CoinFlip className="CoinFlipAnimation" animation={gameFinished ? 'done' : (!startFlip ? 'loading' : 'ready')} winningSide={!startFlip ? null : gameData.winner} image={!startFlip ? coinLoading : coinReady}/>
                 {gameData.winner === null ? <div style={{width: '300px', height: '150px'}}></div> : <Player name={gameData.p2.name} side={gameData.p2.side} wallet={gameData.p2.wallet} result={gameFinished ? (gameData.winner === gameData.p2.side ? '-winner' : '') : ''}/>}
             </div>
-            {gameFinished ? <Confetti confettiSource={{ x: (gameData.winner === gameData.p1.side ? 0 : window.innerWidth - 300), y: 0, w: 300, h: 0 }}/> : null}
+            {gameFinished ? <Confetti className="LaptopScreenConfetti" confettiSource={{ x: (gameData.winner === gameData.p1.side ? 0 : window.innerWidth - 300), y: 0, w: 300, h: 0 }}/> : null}
+            {gameFinished && gameData.p1.side === gameData.winner ? <Confetti className="PhoneScreenConfetti" confettiSource={{ x: 0, y: 0, w: 300, h: 0 }}/> : null}
             {gameFinished ?  <div className="GameOverOptions">
                                     <a className="GameOverOption" href="/flip">Play Again</a>
                                     <a className="GameOverOption" href="/">Return to Home</a>
                                 </div> 
-                        : null
+                        : <div className="GameOverOptions"></div>
             }
         </div>
         : <Navigate to="/" />)

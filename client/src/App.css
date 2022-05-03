@@ -2,9 +2,31 @@
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    margin: 125px 0;
 }
 
 .AppEmptyDiv {
-    width: 300px;
+    width: 250px;
     margin: 200px 0;
+}
+
+/* Smartphones (portrait and landscape) ----------- */
+@media screen 
+and (max-width : 480px) {
+    .AppBody {
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        justify-content: center;
+        margin: 50px;
+    }
+    
+    .WaitingPlayers {
+        display: flex;
+        margin: 50px;
+    }
+    
+    .AppEmptyDiv {
+        display: none;
+    }
 }

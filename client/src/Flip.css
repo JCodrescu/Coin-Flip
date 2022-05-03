@@ -136,3 +136,88 @@
     margin: 0;
     padding: 0;
 }
+
+@media screen 
+and (max-width : 480px) {
+    .flip {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        margin-top: 50px;
+        align-items: center;
+        width: 100%;
+        /* width: 400px; */
+        /* border: solid black 1px; */
+    }
+
+    .flipRowText {
+        display: flex;
+        justify-content: flex-end;
+        width: 125px;
+        font-size: 20px;
+        color: purple;
+        /* border: 1px solid black; */
+        margin: 0 0 0px 0;
+    }
+    
+    .flipRowInput {
+        font-size: 20px;
+        width: 230px;
+        color: rgb(82, 197, 168);
+        margin: 0 0 0px 10px;
+        /* border: 1px solid black; */
+        padding: 0px 0 0px 0;
+    }
+
+    .flipRow {
+        display: flex;
+        flex-direction: row;
+    }
+/* 
+    #flipButton {
+        width: 50px;
+    } */
+    
+    #betInput {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .betButton-selected {
+        background-color: purple; /* Green */
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .sideButton {
+        background-color: white; /* Green */
+        display: flex;
+        align-items: center;
+        border: none;
+        color: rgb(82, 197, 168);
+        font-size: 21px;
+        margin: 0 12px 0 0;
+        height: 65px;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .sideButton-selected {
+        background-color: white; /* Green */
+        border: none;
+        display: flex;
+        align-items: center;
+        color: purple;
+        font-size: 25px;
+        margin: 0 12px 0 0;
+        height: 100%;
+        padding: 0;
+        cursor: pointer;
+    }
+}

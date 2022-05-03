@@ -24,20 +24,12 @@
         transform: rotateY(360deg);
     }
   }
-/* 
-.CoinLogo:hover, .CoinLogo:focus {
-    opacity: .6;
-} */
 
 #flip {
     font-size: 70px;
     margin-left: 30px;
     margin-bottom: 5px;
 }
-/* 
-#flip:hover, #flip:focus {
-    opacity: .6;
-} */
 
 .Hamburger {
     margin-right: 10px;
@@ -52,4 +44,31 @@
     display: flex;
     align-items: center;
     margin-left: 30px;
+}
+
+@media screen 
+and (max-width : 480px) {
+    .HeaderEmptyDiv {
+        display: none;
+    }
+
+    .StartLogo {
+        display: flex;
+    }
+
+    #flip {
+        font-size: 70px;
+        margin-bottom: 5px;
+    }
+
+    .StartHeader {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .Hamburger {
+        cursor: pointer;
+    }
 }

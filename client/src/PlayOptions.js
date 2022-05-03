@@ -7,19 +7,19 @@ function PlayOptions() {
                 href="/flip"
                 className='PlayOption'
             >
-                flip
+                flip a coin
             </a>
             <a 
                 href="/flip"
                 className='PlayOption'
             >
-                create private room
+                create private game
             </a>
             <a 
                 href="/flip"
                 className='PlayOption'
             >
-                join private room
+                join private game
             </a>
         </div>
     );

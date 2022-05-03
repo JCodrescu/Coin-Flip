@@ -1,38 +1,34 @@
 .Player {
     display: flex;
-    justify-content: center;
     flex-direction: column;
-    align-items: center;
-    width: 300px;
-    height: 150px;
-    overflow: hidden;
-    margin: 10px;
+    margin: 20px 0;
+    /* border: 1px solid black; */
 }
 
 .PlayerRow {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     flex-direction: row;
     margin: 10px;
-    width: 340px;
 }
 
 .PlayerRowText {
     display: flex;
-    justify-content: flex-end;
-    margin-right: 20px;
-    width: 75px;
+    flex-direction: column;
+    margin-right: 10px;
+    margin-left: 100px;
+    width: 60px;
     font-size: 20px;
     color: purple;
-    align-items: center;
-    align-content: center;
+    align-items: flex-end;
 }
 
 .PlayerRowInput {
+    /* border: 1px solid black; */
     display: flex;
     justify-content: flex-start;
-    font-size: 20px;
     width: 200px;
+    font-size: 20px;
     align-items: center;
     align-content: center;
 }

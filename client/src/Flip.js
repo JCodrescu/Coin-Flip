@@ -24,33 +24,11 @@ function Flip(props) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({name: name, side: side, bet: bet, wallet: wallet})
         };
-        fetch("/addPlayer", requestOptions)
+        fetch('/joinGame', requestOptions)
             .then(result => result.json())
             .then(result => {
-                if (result.result === "success") {
-                    return fetch('/joinGame', requestOptions);
-                }
-                else if (result.result === "username taken") {
-                    alert("username taken");
-                    changeName(null);
-                    setLoading(false);
-                    return null;
-                }
-                else {
-                    alert("an error happened");
-                    changeName(null);
-                    setLoading(false);
-                    return null;
-                }
-            })
-            .then(result => {
-                if (!result) return null;
-                return result.json();
-            })
-            .then(result => {
-                if (!result) return null;
                 let game = {
-                    'p1': {'name': name, 'side': side, 'wallet': wallet},
+                    'p1': {'name': name, 'side': result.givenSide, 'wallet': wallet},
                     'p2': {'name': result.name, 'side': result.side, 'wallet': result.wallet},
                     'bet': bet,
                     'winner': result.winner,
@@ -60,6 +38,7 @@ function Flip(props) {
             })
             .catch(err => {
                 console.log(err);
+                console.log("didnt work")
             });
     }
 
@@ -90,11 +69,15 @@ function Flip(props) {
                 <div className='flipRow' id="bet">
                     <div className='flipRowText' id="betText">Bet Amount:</div>
                     <div className='flipRowInput' id="betInput">
-                        <button onClick={() => changeBet("1")} className={"betButton" + (bet === "1" ? "-selected" : "")}>1</button>
-                        <button onClick={() => changeBet("5")} className={"betButton" + (bet === "5" ? "-selected" : "")}>5</button>
-                        <button onClick={() => changeBet("10")} className={"betButton" + (bet === "10" ? "-selected" : "")}>10</button>
-                        <button onClick={() => changeBet("25")} className={"betButton" + (bet === "25" ? "-selected" : "")}>25</button>
-                        <button onClick={() => changeBet("50")} className={"betButton" + (bet === "50" ? "-selected" : "")}>50</button>
+                        <div>
+                            <button onClick={() => changeBet("1")} className={"betButton" + (bet === "1" ? "-selected" : "")}>1</button>
+                            <button onClick={() => changeBet("5")} className={"betButton" + (bet === "5" ? "-selected" : "")}>5</button>
+                            <button onClick={() => changeBet("10")} className={"betButton" + (bet === "10" ? "-selected" : "")}>10</button>
+                        </div>
+                        <div>
+                            <button onClick={() => changeBet("25")} className={"betButton" + (bet === "25" ? "-selected" : "")}>25</button>
+                            <button onClick={() => changeBet("50")} className={"betButton" + (bet === "50" ? "-selected" : "")}>50</button>
+                        </div>
                     </div>
                 </div>
                 <div className='flipRow' id="side">
@@ -102,7 +85,7 @@ function Flip(props) {
                     <div className='flipRowInput' id="sideInput">
                         <button onClick={() => changeSide("Heads")} className={"sideButton" + (side === "Heads" ? "-selected" : "")}>Heads</button>
                         <button onClick={() => changeSide("Tails")} className={"sideButton" + (side === "Tails" ? "-selected" : "")}>Tails</button>
-                        <button onClick={() => changeSide("Choose For Me")} className={"sideButton" + (side === "Choose For Me" ? "-selected" : "")}>Choose For Me</button>
+                        <button onClick={() => changeSide("Choose For Me")} className={"sideButton" + (side === "Choose For Me" ? "-selected" : "")}>Random</button>
                     </div>
                 </div>
                 <div className='flipRow' id="wallet">

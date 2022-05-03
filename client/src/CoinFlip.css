@@ -1,8 +1,10 @@
 .coin-flip-done-Tails {
     position: relative;
     margin: 10px auto;
+    min-width: 150px;
     width: 150px;
     height: 150px;
+    min-height: 150px;
     transform-style: preserve-3d;
     transition: none;
     transform: rotateX(180deg);
@@ -12,7 +14,9 @@
     position: relative;
     margin: 10px auto;
     width: 150px;
+    min-width: 150px;
     height: 150px;
+    min-height: 150px;
     transform-style: preserve-3d;
     transition: none;
 }
@@ -21,7 +25,9 @@
     position: relative; 
     margin: 10px auto;
     width: 150px;
+    min-width: 150px;
     height: 150px;
+    min-height: 150px;
     transform-style: preserve-3d;
     animation: spin-y 10s forwards;
     animation-iteration-count: infinite;
@@ -40,7 +46,9 @@
     position: relative;
     margin: 10px auto;
     width: 150px;
+    min-width: 150px;
     height: 150px;
+    min-height: 150px;
     transform-style: preserve-3d;
     animation: flip-Tails 5s forwards;
     animation-delay: .5s;
@@ -50,7 +58,9 @@
     position: relative;
     margin: 10px auto;
     width: 150px;
+    min-width: 150px;
     height: 150px;
+    min-height: 150px;
     transform-style: preserve-3d;
     animation: flip-Heads 5s forwards;
     animation-delay: .5s;
