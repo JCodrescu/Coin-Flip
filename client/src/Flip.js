@@ -4,17 +4,16 @@ import './Flip.css';
 import Header from "./Header";
 import { Navigate } from "react-router-dom";
 
-function Flip(props) {
+function Flip() {
     const [isMenuActive, activeMenu] = useState(false);
     const [name, changeName] = useState(null);
-    const [bet, changeBet] = useState(null);
+    const [bet, changeBet] = useState("None");
     const [side, changeSide] = useState('Choose For Me');
-    const [wallet, changeWallet] = useState("0x123abc");
     const [game, setGame] = useState(null);
     const [loading, setLoading] = useState(false);
     let ready = false;
 
-    if (name !== null && bet !== null) {
+    if (name !== null) {
         ready = true;
     }
 
@@ -22,14 +21,14 @@ function Flip(props) {
         let requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({name: name, side: side, bet: bet, wallet: wallet})
+            body: JSON.stringify({name: name, side: side, bet: bet})
         };
         fetch('/joinGame', requestOptions)
             .then(result => result.json())
             .then(result => {
                 let game = {
-                    'p1': {'name': name, 'side': result.givenSide, 'wallet': wallet},
-                    'p2': {'name': result.name, 'side': result.side, 'wallet': result.wallet},
+                    'p1': {'name': name, 'side': result.givenSide},
+                    'p2': {'name': result.name, 'side': result.side},
                     'bet': bet,
                     'winner': result.winner,
                     'gameID': result.gameID
@@ -69,15 +68,11 @@ function Flip(props) {
                 <div className='flipRow' id="bet">
                     <div className='flipRowText' id="betText">Bet Amount:</div>
                     <div className='flipRowInput' id="betInput">
-                        <div>
-                            <button onClick={() => changeBet("1")} className={"betButton" + (bet === "1" ? "-selected" : "")}>1</button>
+                            <button onClick={() => changeBet("None")} className={"betButton" + (bet === "None" ? "-selected" : "")}>None</button>
                             <button onClick={() => changeBet("5")} className={"betButton" + (bet === "5" ? "-selected" : "")}>5</button>
                             <button onClick={() => changeBet("10")} className={"betButton" + (bet === "10" ? "-selected" : "")}>10</button>
-                        </div>
-                        <div>
                             <button onClick={() => changeBet("25")} className={"betButton" + (bet === "25" ? "-selected" : "")}>25</button>
                             <button onClick={() => changeBet("50")} className={"betButton" + (bet === "50" ? "-selected" : "")}>50</button>
-                        </div>
                     </div>
                 </div>
                 <div className='flipRow' id="side">
@@ -87,10 +82,6 @@ function Flip(props) {
                         <button onClick={() => changeSide("Tails")} className={"sideButton" + (side === "Tails" ? "-selected" : "")}>Tails</button>
                         <button onClick={() => changeSide("Choose For Me")} className={"sideButton" + (side === "Choose For Me" ? "-selected" : "")}>Random</button>
                     </div>
-                </div>
-                <div className='flipRow' id="wallet">
-                    <div className='flipRowText' id="walletText">Wallet:</div>
-                    <div className='flipRowInput' id="walletInput">{wallet !== null ? wallet : "Connect Wallet"}</div>
                 </div>
                 {ready ?  
                     <button onClick={() => {setLoading(true)}} className="flipRow" id={"readyButton" + (ready ? '-ready' : '')}>Ready</button>

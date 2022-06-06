@@ -12,18 +12,18 @@ app.use(express.static(path.join(__dirname, 'client', 'build')));;
 app.use(express.json());
 
 const client = (() => {
-if (process.env.NODE_ENV !== 'production') {
-    return new Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: true
-    });
-} else {
-    return new Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false
-          }
-    });
+    if (process.env.NODE_ENV !== 'production') {
+        return new Client({
+            connectionString: process.env.DATABASE_URL,
+            ssl: true
+        });
+    } else {
+        return new Client({
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
+                rejectUnauthorized: false
+            }
+        });
 } })();
 client.connect();
 
@@ -50,7 +50,7 @@ function clearOldGames() {
 clearOldGames();
 
 app.post('/joinGame', (req, res) => {
-    const {name, wallet, side, bet} = req.body;
+    const {name, side, bet} = req.body;
     if (!name || !bet) {
         res.status(400).json({'error': 'please include necessary body'});
         return;
@@ -62,12 +62,12 @@ app.post('/joinGame', (req, res) => {
         .query('begin')
         .then(result => {
             return client.query(
-                `select p1_name as name, p1_side as side, p1_wallet as wallet, id
+                `select p1_name as name, p1_side as side, id
                 from Games
                 where p2_name is null
                 and p1_side <> $1
                 and bet = $2`,
-                [side, bet]
+                [side, bet === "None" ? 0 : bet]
             );
         })
         .then(result => {
@@ -76,14 +76,13 @@ app.post('/joinGame', (req, res) => {
                 winner = Math.floor(Math.random() * 2) % 2 === 0 ? 'Heads' : 'Tails' // decide winner here
                 response = {
                     'name': result.rows[0].name, 
-                    'wallet': result.rows[0].wallet, 
                     'side': result.rows[0].side, 
                     'gameID': result.rows[0].id, 
                     'winner': winner,
                     'givenSide': side};
                 return client.query(
-                    'update Games set p2_name = $1, p2_side = $2, p2_wallet = $3, winner = $4, created = $5 where id = $6',
-                    [name, side, wallet, winner, new Date(), result.rows[0].id]
+                    'update Games set p2_name = $1, p2_side = $2, winner = $3, created = $4 where id = $5',
+                    [name, side, winner, new Date(), result.rows[0].id]
                 );
             }
             else { // if no game are a match then create a new one
@@ -93,8 +92,8 @@ app.post('/joinGame', (req, res) => {
                 if (game > 10000) game = 1;
                 response = {'name': null, 'wallet': null, 'side': null, 'gameID': gameID, 'winner': null, 'givenSide': coinSide};
                 return client.query(
-                    'insert into Games (p1_name, p1_side, p1_wallet, p2_name, p2_side, p2_wallet, bet, winner, id, created) values ($1, $2, $3, null, null, null, $4, null, $5, null)',
-                    [name, coinSide, wallet, bet, gameID]
+                    'insert into Games (p1_name, p1_side, p2_name, p2_side, bet, winner, id, created) values ($1, $2, null, null, $3, null, $4, null)',
+                    [name, coinSide, bet === "None" ? 0 : bet, gameID]
                 );
             }
         })
@@ -102,14 +101,7 @@ app.post('/joinGame', (req, res) => {
             return client.query("commit");
         })
         .then(result => {
-            if (response.name) {
-                console.log("money transfer happening!"); // transfer money here
-            }
-            else {
-                console.log("new game. no money transfer yet.");
-            }
             res.json(response);
-            // }
         })
         .catch((err) => {
             console.log(err)
@@ -129,12 +121,12 @@ app.post('/checkGameState', (req, res) => { // used for p1 to poll until another
         return;
     }
     client
-        .query(`select p2_name as name, p2_side as side, p2_wallet as wallet, winner
+        .query(`select p2_name as name, p2_side as side, winner
                 from Games
                 where Games.id = ${gameID}`)
         .then(result => {
             if (result.rows.length === 1) { // game exists
-                res.json({'name': result.rows[0].name, 'wallet': result.rows[0].wallet, 'side': result.rows[0].side, 'winner': result.rows[0].winner});
+                res.json({'name': result.rows[0].name, 'side': result.rows[0].side, 'winner': result.rows[0].winner});
             }
             else { // game does not exist
                 res.status(400).json({'error': "game doesn't exist"});
@@ -151,10 +143,8 @@ app.get('/clearTable', (req, res) => { // for management purposes
         
         create table Games (
         p1_name varchar(100) not null,
-        p1_wallet varchar(100),
         p1_side varchar(10) not null,
         p2_name varchar(100),
-        p2_wallet varchar(100),
         p2_side varchar(10),
         bet integer,
         winner varchar(10),

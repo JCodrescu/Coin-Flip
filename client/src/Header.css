@@ -9,6 +9,29 @@
     text-decoration: none;
 }
 
+.Balance {
+    display: flex;
+    flex-direction: row;
+    font-size: 35px;
+    width: 300px;
+    /* border: 1px solid black; */
+}
+
+.Balance-Text {
+    margin-left: 10px;
+    /* border: 1px solid black; */
+}
+
+.Balance-Number {
+    margin-left: 20px;
+    /* border: 1px solid black; */
+}
+
+.ConnectWallet {
+    display: flex;
+    flex-direction: column;
+}
+
 .CoinLogo {
     animation-duration: 4s;
     animation-name: spin;
@@ -34,6 +57,7 @@
 .Hamburger {
     margin-right: 10px;
     cursor: pointer;
+    padding-left: 300px;
 }
 
 .Hamburger:hover, .Hamburger:focus {

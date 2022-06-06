@@ -9,8 +9,6 @@ function Router() {
             <Routes>
                 <Route path="/" element={<App />} />
                 <Route path="flip" element={<Flip />} />
-                <Route path="create" element={<Navigate to="/" />} />
-                <Route path="join" element={<Navigate to="/" />} />
                 <Route path="game" element={<Game />} />
             </Routes>
         </BrowserRouter>

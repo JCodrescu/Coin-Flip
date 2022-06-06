@@ -1,6 +1,6 @@
 import './PlayOptions.css'
 
-function PlayOptions() {
+function PlayOptions(props) {
     return (
         <div className="PlayOptions">
             <a 
@@ -8,18 +8,6 @@ function PlayOptions() {
                 className='PlayOption'
             >
                 flip a coin
-            </a>
-            <a 
-                href="/flip"
-                className='PlayOption'
-            >
-                create private game
-            </a>
-            <a 
-                href="/flip"
-                className='PlayOption'
-            >
-                join private game
             </a>
         </div>
     );

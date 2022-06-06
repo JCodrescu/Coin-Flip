@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OverlayMenu from "./OverlayMenu";
 import PlayOptions from "./PlayOptions";
 import Header from "./Header";
@@ -7,13 +7,13 @@ import './App.css';
 
 function App() {
     const [isMenuActive, activeMenu] = useState(false);
-
+    
     return (
     <div className="app">
         <Header onMenuClick={() => activeMenu(!isMenuActive)}/>
         <div className='AppBody'>
             <WaitingPlayers className="WaitingPlayers"/>
-            <PlayOptions />
+            <PlayOptions/>
             <div className="AppEmptyDiv"></div>
         </div>
         <OverlayMenu 

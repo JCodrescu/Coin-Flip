@@ -2,7 +2,6 @@
     display: flex;
     flex-direction: column;
     margin: 20px 0;
-    /* border: 1px solid black; */
 }
 
 .PlayerRow {
@@ -24,7 +23,6 @@
 }
 
 .PlayerRowInput {
-    /* border: 1px solid black; */
     display: flex;
     justify-content: flex-start;
     width: 200px;

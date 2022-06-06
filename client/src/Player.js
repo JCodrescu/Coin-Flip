@@ -11,10 +11,6 @@ function Player(props) {
                 <div className='PlayerRowText'>Side:</div>
                 <div className={'PlayerRowInput' + (props.result)}>{props.side}</div>
             </div>
-            <div className='PlayerRow'>
-                <div className='PlayerRowText'>Wallet:</div>
-                <div className={'PlayerRowInput' + (props.result)}>0x123456abcdef</div>
-            </div>
         </div>
     );
 }
